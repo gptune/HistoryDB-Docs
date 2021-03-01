@@ -8,17 +8,15 @@ Welcome to GPTune History Database's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Overview:
 
-   src/historydb_motivation.md
-   src/historydb_features.md
+   src/overview.md
 
 .. toctree::
    :maxdepth: 2
    :caption: UserGuide
 
-   src/userguide_funceval.md
-   src/userguide_surrogatemodel.md
+   src/userguide.md
 
 .. toctree::
    :maxdepth: 2
