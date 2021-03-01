@@ -5,25 +5,24 @@ GPTune is part of the [xSDK4ECP](https://xsdk.info/ecp) project supported by the
 
 GPTune is designed to tune high-performance application codes as "black-boxes", running them for carefully chosen tuning parameter values and building a performance model (i.e. surrogate model) based on the measured performance (i.e. function evaluation data).
 One of the main costs with this approach is the expensive black-box objective function (i.e. run and measure the application on a parallel machine).
-To reduce this cost, the history database aims to provide the following features:
+
+The history database aims to reduce the cost by providing the following features:
 
 **Re-using autotuning data.**
-The proposed history database can re-use performance data (e.g. function evaluation data and trained surrogate models) obtained from previous autotuning.
+The history database allows the user to re-use performance data (e.g. function evaluation data and trained surrogate models) obtained from previous autotuning.
 This allows the user to continue autotuning without recollecting data or rebuilding the surrogate model.
 
 **Harnessing the power of crowdtuning.**
 We provide a public shared database, where users can store their performance data or download the performance data provided by other users.
-With the shared database, everyone can benefit from (expensive) runs of widely used high-performance computing codes.
+Therefore, everyone can benefit from (expensive) runs of widely used high-performance computing codes.
 
 **Reproducible autotuning.**
-Users may want to reproduce performance data from the same or different users.
+Some users may want to reproduce performance data from the same or different users.
 We aim to provide a portable workflow automation framework to help users reproduce performance data that exist in our shared database.
 
-# History Database Features
+# What You Can Do with History Database
 
 GPTune users can invoke the history database either by manual Python coding in the application-GPTune driver code or by using a command line interface provided by the workflow automation tool called CK-GPTune.
-If the history database is invoked, GPTune can store and load performance data to and from performance data files in the user's local storage; each application (code) will have a data file that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the application in JavaScript Object Notation ([JSON](https://www.json.org/json-en.html)) format.
-
 In what follows, we present what you can do with the GPTune history database.
 
 **Re-using function evaluation data.**
