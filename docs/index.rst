@@ -8,23 +8,29 @@ Welcome to GPTune History Database's documentation!
 
 .. toctree::
    :maxdepth: 2
+   :caption: Introduction:
+
+   src/introduction.md
+
+.. toctree::
+   :maxdepth: 2
    :caption: Overview:
 
    src/overview.md
 
 .. toctree::
    :maxdepth: 2
-   :caption: UserGuide
+   :caption: User Guide:
 
    src/userguide.md
+   src/ckgptune.md
 
 .. toctree::
    :maxdepth: 2
-   :caption: CK-GPTune
+   :caption: User Feedback:
 
-   src/ckgptune_background.md
-   src/ckgptune_installation.md
-   src/ckgptune_examples.md
+   src/userfeedback.md
+
 
 Indices and tables
 ==================
