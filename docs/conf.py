@@ -19,7 +19,7 @@
 
 project = 'GPTune History Database'
 copyright = '2021, GPTune-Dev (gptune-dev@lbl.gov)'
-author = 'Younghyun Cho, James W. Demmel, Xiaoye S. Li, Yang Liu, Hengrui Luo'
+author = 'Younghyun Cho, James W. Demmel, Xiaoye S. Li, \\ Yang Liu, Hengrui Luo'
 
 
 # -- General configuration ---------------------------------------------------

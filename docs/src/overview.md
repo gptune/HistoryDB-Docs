@@ -3,13 +3,9 @@
 ![History database design](../static/history_db.png)
 
 The figure illustrates the design of the history database.
-GPTune users can invoke the history database either by manual Python coding in the application-GPTune driver code or by using a command line interface provided by the workflow automation tool called CK-GPTune.
-GPTune allows users to store performance data obtained from autotuning into data files.
-Users can store performance data into their local storage.
-In the local storage, each tuning problem has a data file that contains all the performance data of previous runs of the application.
-The obtained performance data are saved as dictionaries in JavaScript Object Notation (JSON) format.
-The user can also upload their performance data into the public shared repository.
-In the repository, all performance data is managed with MongoDB.
+GPTune users can invoke the history database either by using [Python API](./userguide.md) in the application-GPTune driver code or by using a command line interface (CLI) provided by the workflow automation tool called [CK-GPTune](./ckgptune.md).
+The GPTune history database can store and load performance data to and from performance data files with JavaScript Object Notation ([JSON](https://json.org)) format in the user's local storage.
+In the local storage, each tuning problem has a data file that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
 
 Each data file contains the function evaluation results obtained from the GPTune's Bayesian optimization model.
 The multitask learning autotuning (MLA) of GPTune relies on three information spaces: *input space* (IS), *parameter space* (PS), and *output space* (OS).
@@ -20,77 +16,102 @@ This practice ensures that no data is lost, in the case where  a long run with m
 If GPTune is run in parallel and multiple processes need to update performance data simultaneously, the history database allows one process to update the data file at a time based on simple file access control.
 
 In addition to the information of IS, PS, and OS, the history database also records the meta-description like machine configuration and software information (e.g. which software libraries are used for that application) into the JSON file.
-Users can provide this information manually when calling GPTune, but they can also leverage a workflow automation tool called CK-GPTune to manage the information automatically.
+Users can provide this information manually with the history database Python API, but they can also leverage a workflow automation tool called CK-GPTune to manage the information automatically.
 With CK-GPTune, users can define the application's software dependencies with a meta-description file, then CK-GPTune detects the software packages/libraries that have dependencies, using the Collective Knowledge (CK) technology.
 Based on this information, users will be able to determine which data are relevant for learning from a possibly different machine or software versions or configurations.
 Moreover, the workflow automation support from CK-GPTune will allow users to reproduce performance data from the same and different users.
 
-# JSON File Format For Describing Performance Data
+To harness the power of crowdtuning, we provide a public shared database which allows users to upload their performance data or download performance data provided by other users.
+The user can also upload their performance data into the public shared repository using a web interface at [https://gptune.lbl.gov](https://gptune.lbl.gov), which uses [NERSC](https://www.nersc.gov)'s Science Gateways.
+In the shared repository, all submitted performance data is stored in a storage provided by NERSC and internally managed by using [MongoDB](https://mongodb.com).
+The shared database requires login credentials for users to submit their performance data, but we allow anyone to browse and download data if the data is public data.
 
-## User-Side JSON File Format
+# JSON Format For Describing Performance Data
+
+In this section, we explain the JSON format to store performance data from GPTune.
+Each tuning problem has a seprate data file (*tuning_problem_name.json*) that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
+As shown in the below, each JSON file has two labels *func_eval* and *model_data*, each containing a list of function evaluation results or surrogate model data respectively.
 
 ```Json
 {
-    "name": "application/tuning-problem name",
-    "func_eval": [
-        {
-            ...
-        },
-        {
-            ...
-        },
-        ...
-    ],
-    "model_data": [
-        {
-            ...
-        },
-        {
-            ...
-        },
-        ...
-    ]
+  "func_eval": [
+    {
+      /* function evaluation result */
+    },
+    {
+      /* function evaluation result */
+    },
+
+    ...
+
+    {
+      /* function evaluation result */
+    }
+  ],
+  "model_data": [
+    {
+      /* surroagte model data */
+    },
+    {
+      /* surroagte model data */
+    },
+
+    ...
+
+    {
+      /* surroagte model data */
+    }
+  ]
 }
 ```
 
+<br>
+
 ## Function Evaluation Data
 
-Listing shows a performance data file for the QR factorization routine of ScaLAPACK for two different tasks \{m: 816, n: 599\} and \{m: 669, n: 164\}.
-In this example, we evaluated runtime of one parameter configuration for each task (two parameter configurations in total).
-In Listing~\ref{listing:pdqrdriver.json}, \texttt{I} contains the information about each task parameter, and all the performance data of that task are stored in \texttt{func\_eval} as an array where each array item contains the tuning parameter configuration \texttt{P} and its evaluation result \texttt{O}.
-In GPTune, there is a Python class named \texttt{data} to store sampled tasks, tuning parameters and outputs~\cite{GPTuneUserGuide}.
-After finishing each function evaluation, the history database queries the contents of the \texttt{data} class and updates the performance data file.
+Listing shows a function evaluation result for the QR factorization routine of ScaLAPACK for task \{m: TODO, n: TODO\} and tuning parameters \{mb: TODO, nb: TODO, nproc: TODO, p: TODO\}.
+In this example, we evaluated runtime of the PDGEQRF routine for the given parameter set.
+In the listing, **task_parameter** contains the information about the task parameter, and **tuning_parameter** contains the tuning parameter configuration, and its evaluation result is stored in **output**.
+These information is collected automatically in GPTune if the user invoke the history database.
 
-Each function evaluation data in *func\_eval* can also contain the information about the machine and software configuration to run the application.
+Each function evaluation data can also contain the information about the machine and software configuration to run the application (or the tuning problem).
 The information related to the machine configuration includes the machine name (e.g. Cori) and the number of cores/nodes used.
 The software information contains the versions of software packages that are used for compiling/installing the application.
-The machine and software configurations are stored in *machine\_deps* and *compile\_deps*, respectively.
+The machine and software configurations are stored in *machine_configuration* and *software_configuration*, respectively.
 Unlike task and tuning parameters, the machine and software information is not available in GPTune and needs to be given by the user.
 Users can use CK-GPTune to automatically detect the software dependencies or provide the information manually in the application-GPTune driver code.
 
-Example JSON performance data
+An example function evaluation result in the JSON format
 
 ```Json
 {
-  "I": {
+  "task_parameter": {
     "m": 30000,
     "n": 30000
   },
-  "P": {
+  "tuning_parameter": {
     "mb": 5,
     "nb": 13,
     "nproc": 136,
     "p": 9
   },
-  "machine_deps": {
-    "machine": "cori",
-    "type": "haswell",
-    "nodes": 8,
-    "cores": 32
+  "output": {
+    "r": 15.148637
   },
-  "software_deps": {
+  "machine_configuration": {
+    "machine": "cori",
+    "haswell": [
+      "nodes": 8,
+      "cores": 32
+    ],
+    "knl": [
+      "nodes": 0,
+      "cores": 0
+    ]
+  },
+  "software_configuration": {
     "openmpi": {
-      "version": "4.0.0",
+      "version_str": "4.0.0",
       "version_split": [
         4,
         0,
@@ -99,7 +120,7 @@ Example JSON performance data
       "tags": "lib,mpi,openmpi"
     },
     "scalapack": {
-      "version": "2.1.0",
+      "version_str": "2.1.0",
       "version_split": [
         2,
         1,
@@ -107,9 +128,6 @@ Example JSON performance data
       ],
       "tags": "lib,scalapack"
     }
-  },
-  "O": {
-    "r": 15.148637
   },
   "time": {
     "tm_year": 2021,
@@ -130,8 +148,9 @@ Example JSON performance data
 
 
 
-## Surrogate Model
+## Surrogate Model Data
 
+[TODO]
 
 ```Json
 {
@@ -176,7 +195,6 @@ Example JSON performance data
     ],
     "iteration": 65
   },
-  "iteration": 65,
   "func_eval": [
     "09aab368-612d-11eb-8bf3-bbda784b918d",
     "09aae608-612d-11eb-8bf3-bbda784b918d",

@@ -14,16 +14,15 @@ This allows the user to continue autotuning without recollecting data or rebuild
 
 **Harnessing the power of crowdtuning.**
 We provide a public shared database, where users can store their performance data or download the performance data provided by other users.
-Therefore, everyone can benefit from (expensive) runs of widely used high-performance computing codes.
+Everyone can therefore benefit from (expensive) runs of widely used high-performance computing codes.
 
 **Reproducible autotuning.**
 Some users may want to reproduce performance data from the same or different users.
 We aim to provide a portable workflow automation framework to help users reproduce performance data that exist in our shared database.
 
-# What You Can Do with History Database
+# Use Scenarios
 
-GPTune users can invoke the history database either by manual Python coding in the application-GPTune driver code or by using a command line interface provided by the workflow automation tool called CK-GPTune.
-In what follows, we present what you can do with the GPTune history database.
+Here, we present some use scenarios in which users can use the GPTune history database.
 
 **Re-using function evaluation data.**
 Users can allow GPTune to store function evaluation data obtained from autotuning into data files.
@@ -46,6 +45,17 @@ Again, this feature will be useful whether or not a user wants to share data to 
 GPTune provides a Python interface to run autotuning after loading a GP surrogate model from the database.
 While it supports several model selection criterion to select the model such as MLE (Maximum Likelihood Estimation), AIC (Akaike Information Criterion), and BIC (Bayesian Information Criterion), users can also select a model based on their own method based on the provided statistics information; the history database provides some statistics (e.g. likelihood, gradients) of the model.
 
+In addition to the ability to reuse previous function evaluation data, the history database also supports storing and loading trained GP surrogate models.
+Reusing pre-trained surrogate models can be useful for autotuning users because the modeling phase of GPTune can require a significant amount of time.
+%In addition to the information we currently store (task/tuning parameters and the evaluation results, machine/software configuration), we are currently considering storing some sort of data (e.g.\ trained hyperparameter values, etc.) of the GP surrogate model so that the same or other users can re-use the trained model.
+%In GPTune~\cite{GPTuneUserGuide}, once initial sampling is completed, the GP surrogate model is updated each time GPTune evaluates an additional sample parameter configuration.
+%When the surrogate model is updated, the history database stores the surrogate model data into the database.
+Users can use this feature to save the GP surrogate model after some autotuning and load a trained model to continue autotuning afterward.
+Note that trained surrogate models may not be meaningful for different problem spaces.
+The history database therefore loads trained models only if they match the problem space of the given optimization problem.
+
+
+
 **Define machine/software dependencies.**
 In addition to performance data obtained from autotuning, the history database also records the machine configuration (e.g. the number of nodes/cores used) and software information (e.g. which software libraries are used for that application) into the JSON file.
 Users can provide this information manually when calling GPTune, but they can also leverage a workflow automation tool called [CK-GPTune](https://github.com/yhcho614/ck-gptune/) to manage the information automatically.
@@ -61,17 +71,4 @@ For more information about CK-GPTune, please refer to our Github web pages [here
 
 **Public Shared Repository.**
 To harness the power of crowdtuning, we provide a public shared database which allows users to upload their performance data or download performance data provided by other users.
-
-Here are the main design points of our public database:
-
-* Storage: To store all performance data from multiple sites, we use [Cori](https://docs.nersc.gov/systems/cori/)'s storage system provided by NERSC.
-
-* Web service: The public repository uses web resources provided by NERSC (also known as [Science Gateways](https://www.nersc.gov/assets/Uploads/19-Science-Gateways.pdf) for user-DB connection.
-We provide the web service at [https://gptune.lbl.gov/](https://gptune.lbl.gov) to access the public database.
-
-* DBMS: Since our performance data is managed as JSON files, we use [MongoDB](https://mongodb.com) internally to manage performance data. User data is managed with [SQLite](https://www.sqlite.org/index.html).
-
-* User interface: Users can download/upload performance data from/to the public repository using the web interface.
-
-* User identification: The public database requires login credentials for users to submit their performance data, but we allow anyone to browse and download data if the data is public data.
 
