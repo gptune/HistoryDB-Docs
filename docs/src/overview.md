@@ -29,7 +29,7 @@ The shared database requires login credentials for users to submit their perform
 When submitting performance data, users have several accessibility options to share the data publicly, privately, or with specific users.
 In other words, the shared repository allows anyone to browse and download data if the data is publicly available.
 
-# JSON Format For Describing Performance Data
+# JSON Format
 
 In this section, we explain the JSON format to store performance data from GPTune.
 Each tuning problem has a seprate data file (e.g. *tuning_problem_name.json*) that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
@@ -71,7 +71,7 @@ As shown in the below example, each JSON file has two labels *func_eval* and *mo
 
 <br>
 
-## Function Evaluation Data
+## Function Evaluation Result
 
 Listing shows a function evaluation result for the QR factorization routine of ScaLAPACK for task \{m: TODO, n: TODO\} and tuning parameters \{mb: TODO, nb: TODO, nproc: TODO, p: TODO\}.
 In this example, we evaluated runtime of the PDGEQRF routine for the given parameter set.
@@ -151,7 +151,7 @@ Example function evaluation result:
 }
 ```
 
-## Surrogate Model Data
+## Surrogate Model
 
 This section shows an example to explain what information is stored by GPTune for a surrogate model.
 Listing shows a surrogate model's data for the QR factorization routine of ScaLAPACK for task \{m: TODO, n: TODO\} and tuning parameters \{mb: TODO, nb: TODO, nproc: TODO, p: TODO\}.

@@ -4,7 +4,7 @@
 
 In this section, we introduce [CK-GPTune](https://github.com/yhcho614/ck-gptune) which is a workflow automation framework for GPTune.
 CK-GPTune helps users install GPTune and provides an interface to run GPTune using simple commands.
-CK-GPTune also provides some example programs that users can install/run/autotune using the workflow automation technology.
+CK-GPTune also provides some example tuning problems that users can install/autotune using the workflow automation technology.
 CK-GPTune is built based on the [Collective Knowledge (CK)](https://cknowledge.org) technology that provides a lot of useful functions to automate (experiment) workflows and to define/detect software dependencies to compile and run applications automatically.
 
 ## Background of CK
@@ -39,7 +39,7 @@ $ ck run program:gemm
 For more information, [the CTuning community](https://ctuning.org) provides a lot of documentation about CK including a detailed user manual [CK:Manual](https://ck.readthedocs.io/_/downloads/en/latest/pdf/).
 Also, there is a blog at [https://github.com/michel-steuwer/About-CK](https://github.com/michel-steuwer/About-CK) that provides a good overview of CK.
 
-## Getting Started
+## Installation
 
 ***Installation of CK-GPTune.***
 To use CK-GPTune, users first need to install the CK framework using the following command.
@@ -66,7 +66,7 @@ With CK-GPTune, users have the option to install GPTune ([https://github.com/gpt
 $ ck install ck-gptune:package:gptune
 ```
 
-GPTune relies on several software packages such as OpenMPI, BLAS, LAPACK, Scalapack [1], MPI4PY [2], Scikit-optimize [3], and Autotune [4].
+GPTune relies on several software packages such as OpenMPI, BLAS, LAPACK, [ScaLAPACK](http://www.netlib.org/scalapack/), [MPI4PY](https://mpi4py.readthedocs.io/en/stable/), [Scikit-optimize](https://scikit-optimize.github.io/stable) and [Autotune](https://pypi.org/project/autotune/).
 The command automatically detects if these software packages are available on your system.
 If there are missing software packages, CK-GPTune will print out a message to let you know which software packages need to be installed. If there are multiple software versions in your computer, CK-GPTune will ask you to choose one.
 After resolving all the dependencies, CK-GPTune installs the GPTune library in *$HOME/CK-TOOLS*
@@ -79,15 +79,14 @@ The command detects the GPTune installation path and prepares an executable envi
 $ ck detect soft:lib.gptune
 ```
 
-Some users may want to use already installed GPTune or install GPTune manually by following the GPTune UserGuide [5].
+Some users may want to use already installed GPTune or install GPTune manually by following the GPTune [UsersGuide](https://gptune.lbl.gov/documentation/gptune-user-guide/).
 In this case, users can simply use the above command to detect the installed GPTune and continue using CK-GPTune.
 
 
+## Automation Examples in CK-GPTune
 
-## Available CK-GPTune Examples
-
-CK-GPTune currently provides four example programs including *gptune-demo*, *scalapack\-pdqrdriver* [1], *superlu-pddspawn* [6], and *hypre-ij* [7].
-Each program has its own working directory (e.g. *$HOME/CK/ck-gptune/program/scalapack-pdqrdriver/)*.
+CK-GPTune currently provides four example programs including [gptune-demo](https://gptune.lbl.gov/documentation/gptune-user-guide/), [PDGEQRF (ScaLAPACK)](http://www.netlib.org/scalapack/), [PDDSpawn (SupeLU_DIST)](https://portal.nersc.gov/project/sparse/superlu/) and  [IJ (Hypre)](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods).
+Each program has its own working directory (e.g. *$HOME/CK/ck-gptune/program/scalapack-pdqrdriver/*).
 
 These example programs are managed as components (i.e. CK entries) of [the CK's program module](https://cknowledge.io/c/module/program/) that provides a unified way for program compilation and execution workflow.
 With the CK program module, for example, you can compile and run these benchmarks with a simple command line interface (CLI).
@@ -149,7 +148,7 @@ Users can use the following command to run MLA with pre-trained surrogate models
 $ ck MLA_LoadModel gptune --bench=scalapack-pdqrdriver --method="max_evals" --nruns=50 --machine=cori --nodes=1 --cores=16
 ```
 
-## Adding Workflows to CK-GPTune
+## Workflow Automation with CK
 
 In CK-GPTune, programs are managed as components of the [CK's program](https://cknowledge.io/c/module/program/) module that provides a unified way for program compilation and workflows (and automatic detection of software dependencies) using a CLI and meta description files.
 For these programs, CK-GPTune can automatically run GPTune with the history database.
