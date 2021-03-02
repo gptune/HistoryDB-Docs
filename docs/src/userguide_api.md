@@ -1,6 +1,6 @@
 # History Database API
 
-This section explains the Python API to use the history database features when running the GPTune autotuner.
+This section explains the Python API to use the history database features.
 
 ## Storing/Loading Function Evaluation Data
 
@@ -115,7 +115,7 @@ In addition to the ability to re-use function evaluation results, the history da
 Re-using pre-trained surrogate models can be useful because the modeling phase of GPTune can require a significant amount of computational resources and time.
 
 **Storing surrogate model data.**
-Storing model data is done automatically by GPTune if the user runs GPTune with the history database mode as described in [Storing/Loading Surrogate Model](./userguide_api.md).
+Storing model data is done automatically by GPTune if the user runs GPTune with the history database mode as described in [Storing/Loading Function Evaluation Data](./userguide_api.md).
 The history database stores every modeling data during the autotuning process.
 
 **Run MLA with Pre-Trained Surrogate Models.**
