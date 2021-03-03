@@ -22,9 +22,9 @@ Welcome to GPTune History Database's documentation!
    :maxdepth: 2
    :caption: User Guide:
 
-   src/userguide_api.md
-   src/userguide_repo.md
+   src/historydb_api.md
    src/ckgptune.md
+   src/historydb_web.md
 
 .. toctree::
    :maxdepth: 2

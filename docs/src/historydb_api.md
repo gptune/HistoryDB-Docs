@@ -1,4 +1,4 @@
-# History Database API
+# History DB API
 
 This section explains the Python API to use the history database features.
 
@@ -17,7 +17,7 @@ As shown in lines 43--51, the software versions are passed as dictionaries which
 Users can also use a different identifier such as Git commit information (line 49).
 This can be helpful if the software does not have a specific version number.
 
-The history database can also load previous performacne data when starting autotuning.
+The history database can also load previous performance data when starting autotuning.
 As shown in lines 53--71, users can define conditions (load_condition) using dictionaries to selectively load previous performance data.
 For each load condition, the user can use an array to allow multiple configurations for loading.
 For example, line 59 allows to load performance data obtained when using 15, 16, and 17 core counts.
@@ -144,7 +144,7 @@ Currently, the history database loads trained models only if they match the prob
 
 **Model selection method.**
 In *MLA_LoadModel*, it is important to select the best model data from all available model data.
-By default, *MLA_LoadModel* selects the model data that contains most function evaluation results, assuming that we can build a better model with more function evaulation data.
+By default, *MLA_LoadModel* selects the model data that contains most function evaluation results, assuming that we can build a better model with more function evaluation data.
 *MLA_LoadModel* also provides several more model selection methods, and users can choose one model selection method when calling *MLA_LoadModel*, as follow.
 
 ```Python

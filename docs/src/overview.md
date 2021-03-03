@@ -5,36 +5,35 @@
 The figure illustrates the design of the history database.
 GPTune users can invoke the history database either by using [Python API](./userguide.md) in their GPTune driver code or by using a command line interface (CLI) provided by the workflow automation tool called [CK-GPTune](./ckgptune.md).
 The GPTune history database can store and load performance data to and from performance data files with JavaScript Object Notation ([JSON](https://json.org)) format in the user's local storage.
-Each tuning problem has a data file that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
+Each tuning problem has a separate data file that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
 
 Each data file contains the function evaluation results obtained from the GPTune's Bayesian optimization model.
 The multitask learning autotuning (MLA) of GPTune relies on three information spaces: **input space (IS)**, **parameter space (PS)**, and **output space (OS)**.
 IS contains all the input problems (i.e. tasks) that the application may encounter (e.g. the sizes of matrices, pointers to input files) and PS contains all the tuning parameter configurations to be optimized (e.g. size of row/column blocks).
 OS is the output space for each of the scalar objective functions (e.g. measured runtime).
-GPTune saves the function evaluation result for each parameter configuration.
 The history database stores these performance data into the JSON file right after evaluating each parameter configuration.
 This practice ensures that no data is lost, in the case where  a long run with many parameter configurations does not complete.
 If GPTune is run in parallel and multiple processes need to update performance data simultaneously, the history database allows one process to update the data file at a time based on simple file access control.
 
 In addition to the information of IS, PS, and OS, the history database also records the meta-description like machine configuration and software information (e.g. which software libraries are used for that application) into the JSON file.
-Users can provide this information manually with the Python API, but they can also leverage a workflow automation tool CK-GPTune to manage the information automatically.
+Users can provide this information manually using the Python API, but they can also leverage CK-GPTune to manage the information automatically.
 With CK-GPTune, users can define the application's software dependencies with a meta-description file, then CK-GPTune detects the software packages/libraries that have dependencies, using the [Collective Knowledge (CK)](https://cknowledge.io) technology.
 Based on this information, users will be able to determine which data are relevant for learning from a possibly different machine or software versions or configurations.
-Moreover, the workflow automation support from CK-GPTune will allow users to reproduce performance data from the same and different users.
+Moreover, workflow automation will allow users to reproduce performance data from the same and different users.
 
-To harness the power of crowdtuning, we provide a public shared database at [https://gptune.lbl.gov](https://gptune.lbl.gov), where users can upload their performance data and download performance data provided by other users.
-In the shared repository, all submitted performance data is stored in a storage provided by NERSC and internally managed by using [MongoDB](https://mongodb.com).
-The web plaform uses [NERSC](https://www.nersc.gov)'s Science Gateways.
+We provide a public shared repository at [https://gptune.lbl.gov](https://gptune.lbl.gov), where users can upload their performance data obtained from GPTune and download performance data provided by other users.
+In the shared repository, all submitted performance data is stored in a storage provided by [NERSC](https://www.nersc.gov) and internally managed by using [MongoDB](https://mongodb.com).
+The web plaform uses [NERSC](https://www.nersc.gov)'s [Science Gateways](https://docs.nersc.gov/services/science-gateways/).
 The shared database requires login credentials for users to submit their performance data.
-When submitting performance data, users have several accessibility options to share the data publicly, privately, or with specific users.
-In other words, the shared repository allows anyone to browse and download data if the data is publicly available.
+Every submitted performance data can have multiple accessibility options: publicly available data, private data, or data that can be shared with specific users.
+In other words, the shared repository allows anyone to browse and download publicly available data.
 
 # JSON Format
 
 In this section, we explain the JSON format to store performance data from GPTune.
-Each tuning problem has a seprate data file (e.g. *tuning_problem_name.json*) that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
-
-As shown in the below example, each JSON file has two labels *func_eval* and *model_data*, each containing a list of function evaluation results or surrogate model data.
+Each tuning problem has a separate data file (e.g. *tuning_problem_name.json*) that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
+Each JSON file has two labels *func_eval* and *model_data*.
+As the name indicates, *func_eval* contains the list of all function evaluation results, and *model_data* contains the list of the trained surrogate model data.
 
 ```Json
 {
@@ -73,8 +72,7 @@ As shown in the below example, each JSON file has two labels *func_eval* and *mo
 
 ## Function Evaluation Result
 
-Listing shows a function evaluation result for the QR factorization routine of ScaLAPACK for task \{m: TODO, n: TODO\} and tuning parameters \{mb: TODO, nb: TODO, nproc: TODO, p: TODO\}.
-In this example, we evaluated runtime of the PDGEQRF routine for the given parameter set.
+The following listing shows a function evaluation result of the QR factorization routine of [ScaLAPACK](http://www.netlib.org/scalapack/) for a given task/parameter configuration.
 In the listing, **task_parameter** contains the information about the task parameter, and **tuning_parameter** contains the tuning parameter configuration, and its evaluation result is stored in **output**.
 These information is collected automatically in GPTune if the user invoke the history database.
 
@@ -85,8 +83,9 @@ The machine and software configurations are stored in **machine_configuration** 
 Unlike task and tuning parameters, the machine and software information is not available in GPTune and needs to be given by the user.
 Users can use [CK-GPTune](./ckgptune.md) to automatically detect the software dependencies or provide the information [manually](./userguide_api.md) in the application-GPTune driver code.
 
-Also, when storing a function evaluation data, the information about the data-generation time and a unique ID are automatically appended by GPTune.
-This will be used if the user uploads the data into the shared repository to distinguish between different function evaluation results (e.g. if different users submit function evaluation results for the same task and parameter configurations).
+Also, when saving a function evaluation result, the data-creation time and a unique ID of the function evaluation are automatically generated and appended by GPTune.
+This information can be useful if the user uploads the data into our shared repository.
+If different users submit function evaluation results for the same task and parameter configurations, the database can differentiate between different function evaluation results based on their UIDs.
 
 Example function evaluation result:
 
@@ -153,14 +152,14 @@ Example function evaluation result:
 
 ## Surrogate Model
 
-This section shows an example to explain what information is stored by GPTune for a surrogate model.
-Listing shows a surrogate model's data for the QR factorization routine of ScaLAPACK for task \{m: TODO, n: TODO\} and tuning parameters \{mb: TODO, nb: TODO, nproc: TODO, p: TODO\}.
+This section explains what information is stored by GPTune for a surrogate model.
+The below listing shows a surrogate model's data for the IJ routine of [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) for five different function evaluation results for task \{i: 200, j: 200, k: 200\}.
 Label **hyperparameters** contains the list of hyperparameters values which are required to build the surroagate model.
 **model_stats** stores the model's statistics information.
-Here, we assume the GPTune's default modeling scheme, based on Linear Coregionalization Model (LCM), is used.
-And, we can store some statistics information such as *log_likelihood*, *neg_log_likelihood*, *gradients*, and *iteration* (how many iterations were required to converge the model).
+Here, we assume the GPTune's default modeling scheme, based on [Linear Coregionalization Model (LCM)](https://www.osti.gov/etdeweb/biblio/5214736), is used.
+For the GPTune's LCM, we can store some statistics information such as *log_likelihood*, *neg_log_likelihood*, *gradients*, and *iteration* (how many iterations were required to converge the model).
 Note that, trained surrogate models may or may not be meaningful for different problem spaces.
-Therefore, the JSON data also contains task parameter information (**task_parameters**) and which function evaluation results were used (**func_eval**) to build the surrogate model, by containing the list of the UIDs of function evaluation results.
+Therefore, the JSON data also contains task parameter information (**task_parameters**) and which function evaluation results were used (**func_eval**) to build the surrogate model, by containing the list of the UIDs of the function evaluation results.
 The history database can load trained models only if they match the problem space of the given optimization problem.
 Similar to function evaluation results, the data generation time and a unique ID of each model data are also automatically appended by GPTune.
 

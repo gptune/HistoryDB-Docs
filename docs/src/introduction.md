@@ -32,16 +32,16 @@ This is particularly useful if the user's autotuning process can possibly be lon
 **Using pre-trained tuning results obtained by other users.**
 Supercomputing resources are costly for many users.
 With our shared repository, users can use already tuned parameter configurations obtained by other users.
-Submitted performance data can also contain the machine and software configuration information, hence users can determine which performance data are relevant for re-using.
+Each performance data can also contain the machine and software configuration information, hence users can determine which performance data are relevant for re-using.
 
 **Open tuning-problem for crowdtuning.**
-Users can define their tuning problem on the GPTune shared repository.
-Based on the open tuning problem information, multiple users can run autotuning for the same tuning problem while sharing performance data.
-This feature is particularly useful if the HPC code is expensive to run, and there are multiple users who want to use the same HPC code.
+Users can post their tuning problems on the GPTune shared repository.
+Based on the tuning problem information, multiple users at different sites can run autotuning for the same tuning problem while sharing performance data.
+This feature is particularly useful if the HPC code is expensive to run, and/or there are multiple users who want to use the same HPC code.
 
 **Sharing reproducing autotuning workflows.**
 Users can automate their tuning process using the [CK](https://cknowledge.io) technology and can upload the automation information into the database.
-The automation allows other users to reproduce performance data easily, and makes the crowdtuning effort more feasible.
+The automation allows other users to reproduce performance data easily, which makes the crowdtuning effort more feasible.
 
 **Re-using GP surrogate model.**
 The history database also supports storing and loading trained GP surrogate models along with some model statistics information such as likelihood values of the model.

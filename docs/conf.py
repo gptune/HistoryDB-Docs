@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'GPTune History Database'
-copyright = '2021, GPTune-Dev (gptune-dev@lbl.gov)'
-author = 'Younghyun Cho, James W. Demmel, Xiaoye S. Li, \\ Yang Liu, Hengrui Luo'
+copyright = '2021, Younghyun Cho, James W. Demmel, Xiaoye S. Li, Yang Liu, and Hengrui Luo. UC Berkeley and LBNL. email: gptune-dev@lbl.gov'
+author = 'Younghyun Cho, James W. Demmel, Xiaoye S. Li, Yang Liu, Hengrui Luo'
 
 
 # -- General configuration ---------------------------------------------------

@@ -83,7 +83,7 @@ Some users may want to use already installed GPTune or install GPTune manually b
 In this case, users can simply use the above command to detect the installed GPTune and continue using CK-GPTune.
 
 
-## Automation Examples in CK-GPTune
+## Tuning Examples in CK-GPTune
 
 CK-GPTune currently provides four example programs including [gptune-demo](https://gptune.lbl.gov/documentation/gptune-user-guide/), [PDGEQRF (ScaLAPACK)](http://www.netlib.org/scalapack/), [PDDSpawn (SupeLU_DIST)](https://portal.nersc.gov/project/sparse/superlu/) and  [IJ (Hypre)](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods).
 Each program has its own working directory (e.g. *$HOME/CK/ck-gptune/program/scalapack-pdqrdriver/*).
