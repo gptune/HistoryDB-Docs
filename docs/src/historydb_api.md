@@ -57,7 +57,7 @@ Example Python application-GPTune driver code:
 28:    
 29:    # setting to use the history database
 30:    history_db = HistoryDB()
-31:    history_db.application_name = 'PDGEQRF' # database file name
+31:    history_db.tuning_problem_name = 'PDGEQRF' # database file name
 32:    history_db.history_db_path = './' # default location is $PWD
 33:    
 34:    # optional information to store into the history database
@@ -71,31 +71,31 @@ Example Python application-GPTune driver code:
 42:
 43:    history_db.software_configuration = {
 44:        "openmpi":{
-45:            "version":"4.0.0",
-46:            "version_split":[4,0,0],
+45:            "version_number": 4.0,
+46:            "version_split": [4,0,0]
 47:        },
 48:        "scalapack":{
-49:            "git":"bc6cad585362aa58e05186bb85d4b619080c45a9"
+49:            "version_text":"bc6cad585362aa58e05186bb85d4b619080c45a9"
 50:        },
 51:    }
 52:            
-53:    # conditions for loading previous performance data
-54:    history_db.load_condition = {
-55:        "machine_configuration": {
-56:            "machine":['cori'], # load only if the data's machine name is cori
-57:            "haswell": {
-58:                "nodes":[1], # load only if the data's node count is 1
-59:                "cores":[15,16,17] # load if the data's core count is 15, 16, or 17.
-60:            }
-61:        },
-62:        "software_configuration": {
-63:            "openmpi":{
-64:                "version_from":[4,0,0],
-65:                "version_to":[5,0,0]
-66:            },
-67:            "scalapack":{
-68:                "git":"bc6cad585362aa58e05186bb85d4b619080c45a9"
-69:            }
+53:    # machine configuration conditions for loading previous performance data
+54:    history_db.loadable_machine_configurations = {
+55:        "cori": {
+56:            "haswell": {
+57:                "nodes":[1], # load only if the data's node count is 1
+58:                "cores":[15,16,17] # load if the data's core count is 15, 16, or 17.
+59:            }
+60:        },
+61:    }
+62:    # software configuration condition for loading previous performance data
+63:    history_db.loadable_software_configurations = {
+64:        "openmpi":{
+65:            "version_split_from":[4,0,0],
+66:            "version_split_to":[5,0,0]
+67:        },
+69:        "scalapack":{
+69:            "version_text":"bc6cad585362aa58e05186bb85d4b619080c45a9"
 70:        }
 71:    }
 72:    
@@ -125,7 +125,7 @@ Users can invoke *MLA_LoadModel* as follows.
 ```Python
 # create a history db module instance
 history_db = HistoryDB()
-history_db.tuning_name = 'example'
+history_db.tuning_problem_name = 'example'
 history_db.machine_configuration = {}
 history_db.software_configuration = {}
 history_db.load_condition = {}
