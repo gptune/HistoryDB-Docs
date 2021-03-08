@@ -45,5 +45,5 @@ The automation allows other users to reproduce performance data easily, which ma
 
 **Re-using GP surrogate model.**
 The history database also supports storing and loading trained GP surrogate models along with some model statistics information such as likelihood values of the model.
-Users can use this feature to not only re-use pre-trained models for autotuning, but also analyze model data for research purposes.
+Users can use this feature to not only re-use pre-trained models for autotuning, but also analyze model for research purposes (e.g. sensitivity analysis on the tuning parameters).
 
