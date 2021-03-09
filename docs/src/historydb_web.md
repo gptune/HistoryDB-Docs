@@ -6,9 +6,13 @@ This section explains how to use the web interface for sharing performance data.
 ## User Privilege Levels
 
 To assure provenance and avoid uploading bad data, the repository requires login credentials to submit any data.
+If not registered, users can only access publicly available data.
 Please log-in/sign-up at [https://gptune.lbl.gov/account/login/](https://gptune.lbl.gov/account/login/) to use the history database.
-Once the user completes registration, the repository manager(s) will review the registration information.
+Once the user completes registration, the repository manager(s) will review the registration information and send you a confirmation email.
 The user may need to wait for our approval to use all the nice features of the history database repository.
+The different user privilege levels are summarized in the below figure and can also be found at [https://gptune.lbl.gov/membership](https://gptune.lbl.gov/membership).
+
+![User Privilege Levels](../static/user_privilege_levels.png)
 
 There are multiple accessibility options for each submitted data: publicly available data, private data, and sharing with specific users/groups.
 Registered (and approved) users can create specific user groups at [https://gptune.lbl.gov/repo/add-group/](https://gptune.lbl.gov/repo/add-group/).

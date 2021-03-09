@@ -16,10 +16,10 @@ This practice ensures that no data is lost, in the case where  a long run with m
 If GPTune is run in parallel and multiple processes need to update performance data simultaneously, the history database allows one process to update the data file at a time based on simple file access control.
 
 In addition to the information of IS, PS, and OS, the history database also records the meta-description like machine configuration and software information (e.g. which software libraries are used for that application) into the JSON file.
-There are two ways to provide machine/software configuration information.
+We offer two ways for users to provide machine/software configuration information.
 
 * [HistoryDB API](./historydb_api.md): Users can provide machine/software configuration information manually using our Python API.
-* [CK-GPTune](./ckgptune.md): users can define the application's software dependencies with a meta-description file, then CK-GPTune detects the software information using the [Collective Knowledge (CK)](https://cknowledge.io) technology.
+* [CK-GPTune](./ckgptune.md): Users can define the application's software dependencies with a meta-description file, then CK-GPTune detects the software information using the [Collective Knowledge (CK)](https://cknowledge.io) technology. Machine configuration still needs to be provided manually by the user.
 
 Based on the provided information, users will be able to determine which data are relevant for learning from a possibly different machine or software versions or configurations.
 Moreover, workflow automation will allow users to reproduce performance data from the same and different users.
@@ -154,11 +154,13 @@ Example function evaluation result:
 
 ## Surrogate Model
 
-This section explains what information is stored by GPTune for a surrogate model.
+This section explains what information is stored by GPTune for a GP surrogate model.
 The below listing shows a surrogate model's data for the IJ routine of [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) for five different function evaluation results for task \{i: 200, j: 200, k: 200\}.
-Label **hyperparameters** contains the list of hyperparameters values which are required to build the surroagate model.
-**model_stats** stores the model's statistics information.
 Here, we assume the GPTune's default modeling scheme, based on [Linear Coregionalization Model (LCM)](https://dl.acm.org/doi/abs/10.1145/3437801.3441621), is used.
+In the modeling phase in GPTune, key to LCM is to find the best hyperparameter values of the model, i.e. the hyperparameters of the Gaussian kernel and coefficients of the covariance matrix, hence the number of hyperparameters depends on the number of input tasks (in case of MLA) and the number of tuning parameters.
+For the details, please find [the GPTune paper](https://dl.acm.org/doi/abs/10.1145/3437801.3441621) in PPoPP 2021.
+Label **hyperparameters** contains the list of hyperparameters values which are required to build/reproduce the surroagate model.
+**model_stats** stores the model's statistics information.
 For the GPTune's LCM, we can store some statistics information such as *log_likelihood*, *neg_log_likelihood*, *gradients*, and *iteration* (how many iterations were required to converge the model).
 Note that, trained surrogate models may or may not be meaningful for different problem spaces.
 Therefore, the JSON data also contains task parameter information (**task_parameters**) and which function evaluation results were used (**func_eval**) to build the surrogate model, by containing the list of the UIDs of the function evaluation results.
