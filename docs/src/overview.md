@@ -155,11 +155,24 @@ Example function evaluation result:
 ## Surrogate Model
 
 This section explains what information is stored by GPTune for a GP surrogate model.
-The below listing shows a surrogate model's data for the IJ routine of [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) for five different function evaluation results for task \{i: 200, j: 200, k: 200\}.
+The below listing shows the information of a surrogate model for the IJ routine of [Hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods) for five different function evaluation results for task \{i: 200, j: 200, k: 200\}.
+
+Label **hyperparameters** contains the hyperparameters values which are required to reproduce the surroagate model.
 Here, we assume the GPTune's default modeling scheme, based on [Linear Coregionalization Model (LCM)](https://dl.acm.org/doi/abs/10.1145/3437801.3441621), is used.
-In the modeling phase in GPTune, key to LCM is to find the best hyperparameter values of the model, i.e. the hyperparameters of the Gaussian kernel and coefficients of the covariance matrix, hence the number of hyperparameters depends on the number of input tasks (in case of MLA) and the number of tuning parameters.
-For the details, please find [the GPTune paper](https://dl.acm.org/doi/abs/10.1145/3437801.3441621) in PPoPP 2021.
-Label **hyperparameters** contains the list of hyperparameters values which are required to build/reproduce the surroagate model.
+Recall that, for a set of correlated objective functions for all the given tasks \\( \{ y_{i}(x) \}, {i\in 1..\delta}\\), LCM builds a joint model of the target functions \\( \{ f_{i}(x) \}, {i \in 1..\delta} \\), through the underlying assumption of linear dependence on latent functions \\( \{ u_{q} \} \\), each of which is an independent GP:
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+$$ f_{i}(x) = \sum_{q=1}^{Q}{a_{i,q}u_{q}(x)}$$
+where \\( a_{i,q} \\) are hyperparameters, and \\( \{ u_{q} \}\\) are latent functions each of which is an independent GP:
+
+$$ k_{q}(x,x') = \sigma_{q}^{2} exp(-\sum_{j=1}^{\beta}\frac{(x_{j}-{x_{j}}')^{2}}{I_{j}^{q}}) $$
+
+where \\( \sigma_{q} \\) and \\( I_{j}^{q} \\) are also hyperparameters to be learned.
+In addition to the aforementioned hyperparameters \\( a_{i,q} \\), \\( \sigma_{q} \\), \\( I_{j}^{q} \\), we use additional diagonal regularization parameters \\( b_{i,q} \\) and \\( d_{i} \\) for the covariance matrix during the LCM (for the details about the covariance matrix and the parameter search algorithm, please find [the GPTune paper](https://dl.acm.org/doi/abs/10.1145/3437801.3441621) in PPoPP 2021).
+Hence, in the below example which considers one task for 12 tuning parameters, we store 16 hyperparameters in total (12 for \\( I_{j}^{q} \\) and 1 for each of \\( a_{i,q} \\), \\( \sigma_{q} \\), \\( b_{i,q} \\), \\( d_{i} \\)).
+As another example, considering two tasks for 12 tuning parameters, we need to store 36 hyperparameters in total (24 for \\( I_{j}^{q} \\), 4 for \\( a_{i,q} \\), 2 for \\( \sigma_{q} \\), 4 for \\( b_{i,q} \\), 2 for \\( d_{i} \\)).
+
 **model_stats** stores the model's statistics information.
 For the GPTune's LCM, we can store some statistics information such as *log_likelihood*, *neg_log_likelihood*, *gradients*, and *iteration* (how many iterations were required to converge the model).
 Note that, trained surrogate models may or may not be meaningful for different problem spaces.
