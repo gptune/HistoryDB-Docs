@@ -170,8 +170,8 @@ $$ k_{q}(x,x') = \sigma_{q}^{2} exp(-\sum_{j=1}^{\beta}\frac{(x_{j}-{x_{j}}')^{2
 
 where \\( \sigma_{q} \\) and \\( I_{j}^{q} \\) are also hyperparameters to be learned.
 In addition to the aforementioned hyperparameters \\( a_{i,q} \\), \\( \sigma_{q} \\), \\( I_{j}^{q} \\), we use additional diagonal regularization parameters \\( b_{i,q} \\) and \\( d_{i} \\) for the covariance matrix during the LCM (for the details about the covariance matrix and the parameter search algorithm, please find [the GPTune paper](https://dl.acm.org/doi/abs/10.1145/3437801.3441621) in PPoPP 2021).
-Hence, in the below example which considers one task for 12 tuning parameters, we store 16 hyperparameters in total (12 for \\( I_{j}^{q} \\) and 1 for each of \\( a_{i,q} \\), \\( \sigma_{q} \\), \\( b_{i,q} \\), \\( d_{i} \\)).
-As another example, considering two tasks for 12 tuning parameters, we need to store 36 hyperparameters in total (24 for \\( I_{j}^{q} \\), 4 for \\( a_{i,q} \\), 2 for \\( \sigma_{q} \\), 4 for \\( b_{i,q} \\), 2 for \\( d_{i} \\)).
+Hence, in the below example which considers one task (\\( Q=1 \\)) for 12 tuning parameters (\\( \beta=12 \\)), we store 16 hyperparameters in total (12 for \\( I_{j}^{q} \\) and 1 for each of \\( a_{i,q} \\), \\( \sigma_{q} \\), \\( b_{i,q} \\), \\( d_{i} \\)).
+As another example, considering two tasks (\\( Q=2 \\)) for 12 tuning parameters (\\( \beta=12 \\)),, we need to store 36 hyperparameters in total (24 for \\( I_{j}^{q} \\), 4 for \\( a_{i,q} \\), 2 for \\( \sigma_{q} \\), 4 for \\( b_{i,q} \\), 2 for \\( d_{i} \\)).
 
 **model_stats** stores the model's statistics information.
 For the GPTune's LCM, we can store some statistics information such as *log_likelihood*, *neg_log_likelihood*, *gradients*, and *iteration* (how many iterations were required to converge the model).
