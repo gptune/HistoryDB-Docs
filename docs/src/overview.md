@@ -3,7 +3,7 @@
 ![History database design](../static/history_db.png)
 
 The figure illustrates the design of the history database.
-Users can invoke the history database either by using [Python API](./userguide_api.md) in their GPTune driver code or by using a command line interface (CLI) provided by the workflow automation tool called [CK-GPTune](./ckgptune.md).
+Users can use the history database either by using [Python API](./userguide_api.md) in their GPTune driver code or by using a command line interface (CLI) provided by the workflow automation tool called [CK-GPTune](./ckgptune.md).
 The GPTune history database can store and load performance data to and from performance data files with JavaScript Object Notation ([JSON](https://json.org)) format in the user's local storage.
 Each tuning problem has a separate data file that contains all performance data (obtained by the user and/or downloaded from the shared public database) of the tuning problem.
 
@@ -39,6 +39,7 @@ As the name indicates, *func_eval* contains the list of all function evaluation 
 
 ```Json
 {
+  "tuning_problem_name": "my_tuning_problem_name",
   "func_eval": [
     {
       /* function evaluation result */

@@ -1,12 +1,22 @@
 # Motivation and Goals
 
-[GPTune](https://github.com/gptune/GPTune) is an autotuner for high-performance computing codes, relying on multitask learning to help solve the underlying black-box optimization problem.
-GPTune is part of the [xSDK4ECP](https://xsdk.info/ecp) project supported by the Exascale Computing Project (ECP).
+The success of performance tuning depends on collecting a sufficient number of performance data samples, but collecting performance data is an expensive task especially when tuning HPC codes.
+To address this challenge, we designed and developed a shared database for autotuning called *GPTune History Database*.
+The history database allows users to share performance data with other users at different sites.
+Ultimately, the history database would enable the idea of crowd-tuning, which means that mulitple users can collaborate on tuning challenging and expensive problems.
 
+This history database project is part of an autotuning project called [GPTune](https://gptune.lbl.gov).
+GPTune is part of the [xSDK4ECP](https://xsdk.info/ecp) project supported by the Exascale Computing Project (ECP).
+GPTune is designed to tune high-performance computing codes based on multitask and transfer learning to help solve the underlying black-box optimization problem.
+Therefore, collected data in the history database is fully compatible with GPTune, and GPTune has easy interfaces to use historical data.
+The history database can also be used for other autotuners and optimization frameworks.
+
+<!--
 GPTune is designed to tune high-performance application codes as "black-boxes", running them for carefully chosen tuning parameter values and building a performance model (i.e. surrogate model) based on the measured performance (i.e. function evaluation data).
 One of the main costs with this approach is the expensive black-box objective function (i.e. run and measure the application on a parallel machine).
 
 The history database aims to reduce the cost by providing the following features:
+-->
 
 **Re-using autotuning data.**
 The history database allows the user to re-use performance data (e.g. function evaluation data and trained surrogate models) obtained from previous autotuning.

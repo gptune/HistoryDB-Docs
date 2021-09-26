@@ -1,11 +1,11 @@
-# History DB API
+# GPTune Local DB
 
 This section explains the Python API to use the history database features.
 
 ## Storing/Loading Function Evaluation Data
 
-To run GPTune, the user first needs to write a Python GPTune driver code for their tuning problem, as explained in the [GPTune Users Guide](https://gptune.lbl.gov/documentation/gptune-user-guide/).
-To use history database, the user needs to add several lines of code to define the history database options and send the machine/software configuration information.
+To run GPTune, the user first needs to write a Python code (driver code) to invoke GPTune for the tuning problem, as explained in the [GPTune Users Guide](https://gptune.lbl.gov/documentation/gptune-user-guide/).
+To use history database, the user needs to add several lines of code in the driver code to define the history database options and send the machine/software configuration information.
 The below listing shows an example Python code that runs GPTune's multi-task learning autotuning (MLA) with the history database.
 First, the user needs to import the history database module and create an instance (lines 8 and 30).
 The user also needs to set tuning problem name (line 31); the GPTune history database will then create a JSON file using that name.
@@ -119,6 +119,8 @@ Re-using pre-trained surrogate models can be useful because the modeling phase o
 Storing model data is done automatically by GPTune if the user runs GPTune with the history database mode as described in [Storing/Loading Function Evaluation Data](./userguide_api.md).
 The history database stores every modeling data during the autotuning process.
 
+<!--
+
 ### Run MLA with a Pre-Trained Surrogate Model
 
 GPTune provides a method called *MLA_LoadModel* which runs MLA with a pre-trained surrogate model.
@@ -190,9 +192,11 @@ model_uid = model_data[model_index]["uid"]
 gt.MLA_LoadModel(NS=nruns, Igiven=giventask, model_uid=model_uid))
 ```
 
-### Loading a Surrogate Model as a Black-box Function
+-->
 
-In this section, we describe how to load a surrogate model as a black-box function from the database.
+### Reading a Surrogate Model as a Black-box Function
+
+In this section, we describe how to read a surrogate model from the database and use it as a black-box function.
 Here, a black-box function means a callable function (from the user side) which returns the mean value predicted by the surrogate model for the given task and parameter information. The task and parameter information is given by the user as function arguments.
 
 This feature is useful for many interesting scenarios: in-depth analysis using the model function, use the model function to guide autotuning and/or to tune a new problem, to be used for TLA method (future work), etc.
@@ -274,16 +278,19 @@ ret = model_function({
       })
 print (ret) # output is also a dictionary e.g. { "r": 0000 }
 ```
-Note that, for doing this (reproducing surrogate model and using it) we do not need to use MPI at all, meaning that we can consider providing a compact software package if the user just wants to use this feature without running MLA/TLA.
 
+The feature to reuse a pre-trained surrogate model can be used in several useful scenarios.
+
+* Transfer learning. We can treat transfer learning as just like running MLA with pre-trained results. Due to the GPTune's core computational logic, we want to assume that every task always have the same number of sample function evalutaion results. The idea is to use this model function to obtain additional samples of the tasks that cannot be run in the transfer learning method (e.g. result from other machine).
+
+* Make prediction. After we reproduce the surrogate model, the surrogate model predicts the output (mean and variance) for a given numpy array of the parameters (normalized floating point values) without information about the parameter space. When the user wants to load a model function, we assume the user defines the parameter space (e.g. PS in the above Listing 3) with the same parameter order used to build the surrogate model. This limitation can be relaxed with more efforts.
+
+* Sensitivity analysis.
+
+
+<!--
 #### There are remaining practical issues/limitations/concerns - We are working on this:
-
-- After we reproduce the surrogate model, the surrogate model predicts the output (mean and variance) for a given numpy array of the parameters (normalized floating point values) without information about the parameter space. When the user wants to load a model function, we assume the user defines the parameter space (e.g. PS in the above Listing 3) with the same parameter order used to build the surrogate model. This limitation can be relaxed with more efforts.
-
 - Listing 2 shows that the user can load a function from an LCM model (MLA) by providing all the task information. But, if the database contains only one model from MLA (e.g. let say we have a model generated from two tasks MLA [[1000,1000],[500,500]), and if the user provides only one task information (e.g. [[1000,1000]]) when calling *LoadSurrogateModel*, we do not use the LCM model. This can also be relaxed with more efforts.
 
 - Our current next step is to provide a wrapper function for providing IS, PS, and OS (e.g. Listing 3) in the context of further TLA development and/or for other more flexible use cases (e.g. the user may want to run MLA which require space definition while re-using a model function). We can use a meta description file instead of writing it in the Python driver code.
-
-- We plan to use this new feature for TLA2 method - We want to treat TLA2 as just like running MLA with pre-trained results. Due to the GPTune's core computational logic, we want to assume that every task always have the same number of sample function evalutaion results. Yang's idea is to use this model function to obtain additional samples of the tasks that cannot be run in the TLA2 method (e.g. result from other machine).
-
-- There are some minor TODO list for database: storing constant definitions (which is a recently added feature), and updating the surrogate model database, etc.
+-->

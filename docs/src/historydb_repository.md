@@ -1,9 +1,13 @@
-# History DB Web
+# History DB Repository
+
+We offer two interfaces to access the repository (1) interactive web-dashboard or (2) an HTTPs RESTful API (called crowd-tune API).
+
+## Interactive Dashboard
 
 We provide a public shared database at [https://gptune.lbl.gov](https://gptune.lbl.gov) through [NERSC](https://www.nersc.gov)'s [Science Gateways](https://docs.nersc.gov/services/science-gateways/), where users can upload their performance data or download performance data provided by other users.
 This section explains how to use the web interface for sharing performance data.
 
-## User Privilege Levels
+### User Privilege Levels
 
 To assure provenance and avoid uploading bad data, the repository requires login credentials to submit any data.
 If not registered, users can only access publicly available data.
@@ -23,7 +27,7 @@ Also, as shown in the below example, the user can view all the performance data 
 
 ![Managing Accessibility](../static/accessibility.png)
 
-## Downloading Performance Data
+### Downloading Performance Data
 
 To browse and download tuning data (e.g. function evaluation results, surrogate models) from the repository, we provide a web-based dashboard at [https://gptune.lbl.gov/repo/dashboard/](https://gptune.lbl.gov/repo/dashboard/).
 In the dashboard, users first need to select a tuning problem from the drop-down menu.
@@ -39,7 +43,7 @@ If the user is using the dashboard without signing in, the user will only be abl
 
 ![Download tuning data](../static/downloading.png)
 
-## Uploading Performance Data
+### Uploading Performance Data
 
 To upload function evaluation results and/or surrogate model data, the user can use an online form at [https://gptune.lbl.gov/repo/upload/](https://gptune.lbl.gov/repo/upload/).
 The user first needs to select the tuning problem and the machine used for generating the data.
@@ -53,7 +57,7 @@ Finally the web will print a message about how many function evaluation results 
 
 ![Adding tuning data](../static/uploading.png)
 
-## Adding Tuning Problems
+### Adding Tuning Problems
 
 Before uploading any performance data, users need to define their tuning problems in the shared repository unless the same tuning problem already exists in the repository.
 Based on the (well-defined) open tuning problem information, multiple users will be able to run autotuning for the same tuning problem and share performance data.
@@ -72,7 +76,7 @@ The repository will assign a unique name by combining the user-provided tuning p
 
 ![Adding tuning problems](../static/adding_tuning_problem.png)
 
-## Adding Machine Information
+### Adding Machine Information
 
 Similar to tuning problems, the user needs to define machine information using an online form at [https://gptune.lbl.gov/repo/add-machine/](https://gptune.lbl.gov/repo/add-machine/), unless the user's machine information is already available in the repository.
 The available machine list is shown at [https://gptune.lbl.gov/repo/machines/](https://gptune.lbl.gov/repo/machines/).
@@ -89,4 +93,110 @@ In case there are multiple records for the same machine (this is possible as the
 
 ![Adding machine information](../static/adding_machine.png)
 
+## Programmable API
 
+The programmable API is an API to access the repository via HTTPs based on REpresentational State Transfer (REST) principles, which means that the database resources can be identified via a uniform resource identifier (URL) and accessed in various programming languages like C++/Python.
+This means that the user can query the best available tuning parameter to run a certain HPC code.
+
+### API Format
+
+To download performance data, the user can use a general URL form in the following, where *tuning_problem_name* is the name of tuning problem, *machine/software/user_configurations* contain lists of machine/software/user configurations to download.
+
+```Bash
+GET https://gptune.lbl.gov/direct-download/?tuning_problem_name=ScaLAPACK-PDGEQRF&machine_configurations=[ ... ]&software_configurations=[ ... ]&user_configurations=[ ... ] }
+```
+
+Similarly, the general URL form for uploading a function evaluation result is as follows, where *tuning_problem_name* is the name of tuning problem to be queried, and *function_evaluation* is the performance data to be uploaded.
+
+```Bash
+POST https://gptune.lbl.gov/direct-update/?tuning_problem_name=ScaLAPACK-PDGEQRF&function_evaluation={ ... }
+```
+
+The function evaluation data contains the tuning parameter configuration and its evaluated outputs, and the machine and software configuration on which the parameter configuration is evaluated.
+For the JSON format describing a function evaluation data, please refer to Section JSON Format.
+
+### API Key
+
+Unlike the web-dashboard where the user can login from a web browser, all API requests need to contain an API key with a **x-api-key** header (e.g. { ''X-Api-Key'': ''your_API_key''}).
+Each user can generate one or more API keys at [https://gptune.lbl.gov/account/access-tokens](https://gptune.lbl.gov/account/access-tokens).
+When generating an API key, the user can select a display option whether the user agrees to display the user info or prefers to be anonymous.
+Note that, users have to manage their API keys securely, because API keys are used instead of passwords.
+Users have responsibility for any violations conducted using user API keys.
+
+### Python example
+
+As an example, we explain how to use this API from a Python script is using Python's [requests](https://docs.python-requests.org/en/latest/) module.
+Using this feature, users can use own scripts to query performance data in the repository.
+
+To query performance data, the user can use the requests module's *get* function as follows.
+The user needs to provide an API key in the headers, and provide machine configurations and software configuration(s) that the user wants to allow downloading.
+The function will then return a dictionary value (e.g. *r* in the below code) that contains the downloaded performance data (e.g. *r["perf_data"]*) as well as the request response data (e.g. "r.status_code==200" represents the request was success).
+
+```Python
+import requests
+r = requests.get(url="https://gptune.lbl.gov/direct-download",
+                 headers={"x-api-key":"your_api_key"},
+                 params={"tuning_problem_name":"your_tuning_problem",
+                         "machine_configurations": [
+                             {"cori": {"haswell": {"nodes":1, "cores":32}}},
+                             {"cori": {"knl": {"nodes":1, "cores":68}}}
+                         ],
+                         "software_configurations": [
+                             {"gcc": {"version_split":[8,3,0]}}
+                         ]
+                 }
+                 verify=False)
+```
+
+To upload performance data, the user can use the requests module's *post* function.
+The user needs to provide an API key in the headers and provide the function evaluation.
+The function returns a response message.
+
+```Python
+import requests
+r = requests.post(url = "https://gptune.lbl.gov/direct-upload",
+                  headers={"x-api-key":"your_api_key"},
+                  data={"tuning_problem_name":"your_tuning_problem_name",
+                        "function_evaluation_document": {
+                            "task_parameter": { "m": 10, "n": 20 },
+                            "tuning_parameter": { "mb": 2, "nb": 1 }
+                            "evaluation_result": { "runtime": 6 }
+                        }
+                  }
+                  verify=False)
+```
+
+### Run GPTune with an API key
+
+Users can provide an API key to run GPTune autotuner with the HistoryDB repository.
+In other words, historical performance data can be downloaded automatically, and function evaluation results can also be submitted to the repository automatically.
+A more detailed example can be found [here](https://github.com/gptune/GPTune/blob/master/examples/PLASMA_TEST/dgels.py)
+
+```Python
+def objectives():
+    return [result]
+
+tuning_metadata = {
+    "tuning_problem_name": "DGELS",
+    "tuning_problem_category": "PLASMA",
+    "historydb_api_key": "your_api_key",
+    "use_crowd_repo": "yes",
+    "machine_configuration": {
+        "machine_name": "Cori",
+        "haswell": { "nodes": 1, "cores": 32 }
+    },
+    "spack": ["plasma"]
+}
+
+machine, nodes, cores = GetMachineConfiguration(meta_dict=tuning_metadata)
+problem = TuningProblem(input_space, parameter_space, output_space, objectives, constraints, constants=constants)
+historydb = HistoryDB(meta_dict=tuning_metadata)
+computer = Computer(nodes=nodes, cores=cores)
+
+options = Options()
+data = Data(problem)
+
+gt = GPTune(problem, computer=computer, data=data, options=options, historydb=historydb)
+gt.MLA(Input_task=[..], NS=NS, NI=NI)
+
+```
