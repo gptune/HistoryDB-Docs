@@ -2,7 +2,7 @@
 
 ## What is CK-GPTune?
 
-In this section, we introduce [CK-GPTune](https://github.com/yhcho614/ck-gptune) which is a workflow automation framework for GPTune.
+In this section, we introduce [CK-GPTune](https://github.com/yhcho614/ck-gptune) [[2](references.md)] which is a workflow automation framework for GPTune.
 CK-GPTune helps users install GPTune and provides an interface to run GPTune using simple commands.
 CK-GPTune also provides some example tuning problems that users can install/autotune using the workflow automation technology.
 CK-GPTune is built based on the [Collective Knowledge (CK)](https://cknowledge.org) technology that provides a lot of useful functions to automate (experiment) workflows and to define/detect software dependencies to compile and run applications automatically.
@@ -36,7 +36,7 @@ $ ck compile program:gemm
 $ ck run program:gemm
 ```
 
-For more information, [the CTuning community](https://ctuning.org) provides a lot of documentation about CK including a detailed user manual [CK:Manual](https://ck.readthedocs.io/_/downloads/en/latest/pdf/).
+For more information, [the CTuning community](https://ctuning.org) provides a lot of documentation about CK including a detailed user manual [CK:Manual](https://ck.readthedocs.io/_/downloads/en/latest/pdf/) [[11](references.md)].
 Also, there is a blog at [https://github.com/michel-steuwer/About-CK](https://github.com/michel-steuwer/About-CK) that provides a good overview of CK.
 
 ## Installation
@@ -79,7 +79,7 @@ The command detects the GPTune installation path and prepares an executable envi
 $ ck detect soft:lib.gptune
 ```
 
-Some users may want to use already installed GPTune or install GPTune manually by following the GPTune [UsersGuide](https://gptune.lbl.gov/documentation/gptune-user-guide/).
+Some users may want to use already installed GPTune or install GPTune manually by following the [GPTune User Guide](https://gptune.lbl.gov/documentation/gptune-user-guide/) [[5](references.md)].
 In this case, users can simply use the above command to detect the installed GPTune and continue using CK-GPTune.
 
 

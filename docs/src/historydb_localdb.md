@@ -1,123 +1,159 @@
 # GPTune Local DB
 
-This section explains the Python API to use the history database features.
+This section explains the Python API to use the history database features using users' local database.
 
-## Storing/Loading Function Evaluation Data
+## Reusing Function Evaluation Data
 
-To run GPTune, the user first needs to write a Python code (driver code) to invoke GPTune for the tuning problem, as explained in the [GPTune Users Guide](https://gptune.lbl.gov/documentation/gptune-user-guide/).
+To run GPTune, the user first needs to write a Python code (driver code) to invoke GPTune for the tuning problem, as explained in the [GPTune Users Guide](https://gptune.lbl.gov/documentation/gptune-user-guide/) [[5](references.md)].
 To use history database, the user needs to add several lines of code in the driver code to define the history database options and send the machine/software configuration information.
-The below listing shows an example Python code that runs GPTune's multi-task learning autotuning (MLA) with the history database.
-First, the user needs to import the history database module and create an instance (lines 8 and 30).
-The user also needs to set tuning problem name (line 31); the GPTune history database will then create a JSON file using that name.
-It is also possible to optionally define the path of the database file by setting *history_db_path* (line 32).
+As another interface, the user can provide a meta description file in JSON to define the history database option with the path of $driver_directory/.gptune/meta.json ($driver_directory is the directory where the GPTune driver code is located).
 
-As shown in lines 34--51, users can optionally send the information about their machine and software configuration.
-For the machine configuration, users can send the machine name and the number of nodes/cores used (lines 34--41).
-As shown in lines 43--51, the software versions are passed as dictionaries which can contain a string of the software version and an array of the version split numbers (e.g. major, minor, and revision numbers).
-Users can also use a different identifier such as Git commit information (line 49).
+The below listing shows an example Python code that runs GPTune's multi-task learning autotuning (MLA) with the history database.
+First, the user needs to provide a dictionary to describe the tuning meta information, as shown by *tuning_metadata* in the code (lines 35--76).
+The user also needs to set tuning problem name; the GPTune history database will then create a JSON file using that name.
+<!--It is also possible to optionally define the path of the database file by setting *history_db_path*.-->
+
+In the dictionary, users can send the information about their machine and software configuration.
+For the machine configuration (*machine_configuration*), users can send the machine name and the number of nodes/cores used.
+The software versions are also passed as dictionaries (*software_configuration*) which can contain a string of the software version and an array of the version split numbers (e.g. major, minor, and revision numbers).
+Users can also use a different identifier such as Git commit information using *version_text* label instead of *version_split* label.
 This can be helpful if the software does not have a specific version number.
 
 The history database can also load previous performance data when starting autotuning.
-As shown in lines 53--71, users can define conditions (load_condition) using dictionaries to selectively load previous performance data.
+As shown by lines 56--75, users can define load conditions (*lodable_machine_configurations* and *lodable_software_configurations*) using dictionaries to selectively load previous performance data.
 For each load condition, the user can use an array to allow multiple configurations for loading.
-For example, line 59 allows to load performance data obtained when using 15, 16, and 17 core counts.
-Finally, users need to register the history database instance when creating the GPTune instance (line 74) and run MLA_HistoryDB (line 80) to start autotuning.
+
+Then, the user needs to import the history database module and create an instance (line 99).
+Users need to register the history database instance when creating the GPTune instance and run MLA to start autotuning.
 GPTune will then run with the history database mode by loading/storing the performance data from/into the user's local storage.
 
-Example Python application-GPTune driver code:
+The following example is a snippet of GPTune driver code using the history database.
+The full code can be found at [here](https://github.com/gptune/GPTune/blob/master/examples/Scalapack-PDGEQRF/scalapack_MLA.py).
 
 ```Python
- 1:    from autotune.search import *
- 2:    from autotune.space import *
- 3:    from autotune.problem import *
- 4:    from gptune import GPTune
- 5:    from data import Data
- 6:    from options import Options
- 7:    from computer import Computer
- 8:    from historydb import HistoryDB
- 9:    
-10:    task_space = Space([Categorical(['a','b','c'], name="pb")])
-11:    input_space = Space([Integer(0, 10, name="x")])
-12:    output_space = Space([Real(0.0, inf, name="time")])
-13:    
-14:    def objective(point):
-15:        from math import exp
-16:        return exp(point['x'])
-17:    
-18:    cst1 = "x >= .5"
-19:    def cst2(point):
-20:        return (point['x'] < 1.5)
-21:        
-22:    constraints = {'cst1': cst1, 'cst2': cst2}
-23:    
-24:    problem = TuningProblem(task_space, input_space, output_space, objective, constraints, None) # no analytical model
-25:    
-26:    computer = Computer(nodes=1, cores=16)
-27:    option = Options()
-28:    
-29:    # setting to use the history database
-30:    history_db = HistoryDB()
-31:    history_db.tuning_problem_name = 'PDGEQRF' # database file name
-32:    history_db.history_db_path = './' # default location is $PWD
-33:    
-34:    # optional information to store into the history database
-35:    history_db.machine_configuration = {
-36:        "machine":"cori",
-37:        "haswell": {
-38:            "nodes":1,
-39:            "cores":16
-40:        }
-41:    }
-42:
-43:    history_db.software_configuration = {
-44:        "openmpi":{
-45:            "version_number": 4.0,
-46:            "version_split": [4,0,0]
-47:        },
-48:        "scalapack":{
-49:            "version_text":"bc6cad585362aa58e05186bb85d4b619080c45a9"
-50:        },
-51:    }
-52:            
-53:    # machine configuration conditions for loading previous performance data
-54:    history_db.loadable_machine_configurations = {
-55:        "cori": {
-56:            "haswell": {
-57:                "nodes":[1], # load only if the data's node count is 1
-58:                "cores":[15,16,17] # load if the data's core count is 15, 16, or 17.
-59:            }
-60:        },
-61:    }
-62:    # software configuration condition for loading previous performance data
-63:    history_db.loadable_software_configurations = {
-64:        "openmpi":{
-65:            "version_split_from":[4,0,0],
-66:            "version_split_to":[5,0,0]
-67:        },
-69:        "scalapack":{
-69:            "version_text":"bc6cad585362aa58e05186bb85d4b619080c45a9"
-70:        }
-71:    }
-72:    
-73:    # add the history db module into the GPTune module
-74:    gt = GPTune(problem, computer=computer, data=data, options=options, history_db=history_db)
-75:    
-76:    ntask = 2
-77:    nruns = 20
-78:    giventask = [[1],[2]]
-79:    
-80:    (data, model, stats) = gt.MLA_HistoryDB(NS=nruns, Igiven=giventask, NI=ntask, NS1=max(nruns/2, 1))
+001: from autotune.search import *
+002: from autotune.space import *
+003: from autotune.problem import *
+004: from gptune import *
+005:
+006: def objectives(point):
+007:     nodes = point['nodes']
+008:     cores = point['cores']
+009:     bunit = point['bunit']
+010:     m = point['m']
+011:     n = point['n']
+012:     mb = point['mb']*bunit
+013:     nb = point['nb']*bunit
+014:     p = point['p']
+015:     npernode = 2**point['npernode']
+016:     nproc = nodes*npernode
+017:     nthreads = int(cores / npernode)
+018:     q = int(nproc / p)
+019:     nproc = p*q
+020:     params = [('QR', m, n, nodes, cores, mb, nb, nthreads, nproc, p, q, 1., npernode)]
+021:
+022:     elapsedtime = pdqrdriver(params, niter=2, JOBID=0)
+023:
+024:     return elapsedtime
+025:
+026: def cst1(mb,p,m,bunit):
+027:     return mb*bunit * p <= m
+028: def cst2(nb,npernode,n,p,nodes,bunit):
+029:     return nb * bunit * nodes * 2**npernode <= n * p
+030: def cst3(npernode,p,nodes):
+031:     return nodes * 2**npernode >= p
+032:
+033: def main():
+034:
+035:     """ Define tuning metadata for history database """
+036:     tuning_metadata = {
+037:         "tuning_problem_name": "PDGEQRF",
+038:         "machine_configuration": {
+039:             "machine_name": "Cori",
+040:             "haswell": {
+041:                 "nodes": 1,
+042:                 "cores": 32
+043:             }
+044:         },
+045:         "software_configuration": {
+046:             "openmpi": {
+047:                 "version_split": [4,0,1]
+048:             },
+049:             "scalapack": {
+050:                 "version_split": [2,1,0]
+051:             },
+052:             "gcc": {
+053:                 "version_split": [8,3,0]
+054:             }
+055:         },
+056:         "loadable_machine_configurations": {
+057:             "Cori" : {
+058:                 "haswell": {
+059:                     "nodes":1,
+060:                     "cores":32
+061:                 }
+062:             }
+063:         },
+064:         "loadable_software_configurations": {
+065:             "openmpi": {
+066:                 "version_from":[4,0,1],
+067:                 "version_to":[5,0,0]
+068:             },
+069:             "scalapack":{
+070:                 "version_split":[2,1,0]
+071:             },
+072:             "gcc": {
+073:                 "version_split": [8,3,0]
+074:             }
+075:         }
+076:     }
+077:
+078:     (machine, processor, nodes, cores) = GetMachineConfiguration(meta_dict = tuning_metadata)
+079:     print ("machine: " + machine + " processor: " + processor + " num_nodes: " + str(nodes) + " num_cores: " + str(cores))
+080:
+081:     """ Define search space """
+082:     m = Integer(128, 10000, transform="normalize", name="m")
+083:     n = Integer(128, 10000, transform="normalize", name="n")
+084:     mb = Integer(1, 16, transform="normalize", name="mb")
+085:     nb = Integer(1, 16, transform="normalize", name="nb")
+086:     npernode = Integer(1, int(math.log2(cores)), transform="normalize", name="npernode")
+087:     p = Integer(1, nodes*cores, transform="normalize", name="p")
+088:     r = Real(float("-Inf"), float("Inf"), name="r")
+089:
+090:     IS = Space([m, n])
+091:     PS = Space([mb, nb, npernode, p])
+092:     OS = Space([r])
+093:
+094:     constraints = {"cst1": cst1, "cst2": cst2, "cst3": cst3}
+095:     constants={"nodes":nodes,"cores":cores,"bunit":8}
+096:     print(IS, PS, OS, constraints)
+097:
+098:     problem = TuningProblem(IS, PS, OS, objectives, constraints, None, constants=constants)
+099:     historydb = HistoryDB(meta_dict=tuning_metadata)
+100:     computer = Computer(nodes=nodes, cores=cores, hosts=None)
+101:     options = Options()
+102:     data = Data(problem)
+103:
+104:     gt = GPTune(problem, computer=computer, data=data, options=options, historydb=historydb, driverabspath=os.path.abspath(__file__))
+105:
+106:     """ Building MLA with the given list of tasks """
+107:     giventask = [[2000, 2000]]
+108:     NI = len(giventask)
+109:     NS = 20
+110:     (data, model, stats) = gt.MLA(NS=NS, Igiven=giventask, NI=NI, NS1=max(NS//2, 1))
+111:
+112: if __name__ == "__main__":
+113:     main()
 ```
 
-## Storing/Loading Surrogate Models
+## Reusing Trained Surrogate Models
 
 In addition to the ability to re-use function evaluation results, the history database also supports storing and loading trained GP surrogate models.
 Re-using pre-trained surrogate models can be useful because the modeling phase of GPTune can require a significant amount of computational resources and time.
 
-### Storing surrogate models
-
-Storing model data is done automatically by GPTune if the user runs GPTune with the history database mode as described in [Storing/Loading Function Evaluation Data](./userguide_api.md).
-The history database stores every modeling data during the autotuning process.
+Storing model data is done automatically by GPTune if the user runs GPTune with the history database mode. 
+An example of JSON data for recording a surrogate model can be found at [here](overview.html#json-format).
+By default, if LCM is used, the history database stores every modeling data during the autotuning process.
 
 <!--
 
@@ -194,14 +230,10 @@ gt.MLA_LoadModel(NS=nruns, Igiven=giventask, model_uid=model_uid))
 
 -->
 
-### Reading a Surrogate Model as a Black-box Function
-
-In this section, we describe how to read a surrogate model from the database and use it as a black-box function.
+Users can read a surrogate model from the database and use it as a black-box function.
 Here, a black-box function means a callable function (from the user side) which returns the mean value predicted by the surrogate model for the given task and parameter information. The task and parameter information is given by the user as function arguments.
 
-This feature is useful for many interesting scenarios: in-depth analysis using the model function, use the model function to guide autotuning and/or to tune a new problem, to be used for TLA method (future work), etc.
-
-Here is a snippet of code to load a model as a black-box function and call the function for a given task/parameter set for our PDGEQRF example.
+The following is a snippet of code to load a model as a black-box function and call the function for a given task/parameter set for our PDGEQRF example.
 
 **Listing 1**
 ```Python
@@ -279,18 +311,18 @@ ret = model_function({
 print (ret) # output is also a dictionary e.g. { "r": 0000 }
 ```
 
-The feature to reuse a pre-trained surrogate model can be used in several useful scenarios.
+The feature to reuse a pre-trained surrogate model can be used for several useful scenarios: in-depth analysis using the model function, use the model function to guide autotuning and/or to tune a new problem, to be used for transfer learning, etc.
 
-* Transfer learning. We can treat transfer learning as just like running MLA with pre-trained results. Due to the GPTune's core computational logic, we want to assume that every task always have the same number of sample function evalutaion results. The idea is to use this model function to obtain additional samples of the tasks that cannot be run in the transfer learning method (e.g. result from other machine).
+**Transfer learning.**
+We can treat transfer learning as just like running MLA with pre-trained results. Due to the GPTune's core computational logic, we want to assume that every task always have the same number of sample function evalutaion results. The idea is to use this model function to obtain additional samples of the tasks that cannot be run in the transfer learning method (e.g. result from other machine).
+Some examples of this transfer learning approach can be found at [here](https://github.com/gptune/GPTune/tree/master/examples/ScaLAPACK-PDGEQRF-ATMG).
 
-* Make prediction. After we reproduce the surrogate model, the surrogate model predicts the output (mean and variance) for a given numpy array of the parameters (normalized floating point values) without information about the parameter space. When the user wants to load a model function, we assume the user defines the parameter space (e.g. PS in the above Listing 3) with the same parameter order used to build the surrogate model. This limitation can be relaxed with more efforts.
+**Make prediction.**
+After we reproduce the surrogate model, the surrogate model predicts the output (mean and variance) for a given numpy array of the parameters (normalized floating point values) without information about the parameter space. When the user wants to load a model function, we assume the user defines the parameter space (e.g. PS in the above Listing 3) with the same parameter order used to build the surrogate model. This limitation can be relaxed with more efforts.
 
-* Sensitivity analysis.
+**Sensitivity analysis.**
+Another use case of surrogate models is conducting a surrogate model-based sensitivity analysis to determine how different values of individual tuning parameters could affect the output results.
+GPTune currently offers an interface for sensitivity analysis tool based on [the Sobol method](https://www.sciencedirect.com/science/article/abs/pii/S0378475400002706) [[8](references.md)] and using the implementation of a Python module called [SALib](https://joss.theoj.org/papers/10.21105/joss.00097.pdf) [[9](references.md)].
+The Sobol analysis requires (1) samples drawn from the function directly, (2) evaluating the model using the generated sample inputs and saving the model output, and (3) conducting a variance-based mathematical analysis to compute the sensitivity indices.
+In the GPTune interface, we use a pre-trained surrogate model to draw and evaluate samples in this sensitivity analysis approach.
 
-
-<!--
-#### There are remaining practical issues/limitations/concerns - We are working on this:
-- Listing 2 shows that the user can load a function from an LCM model (MLA) by providing all the task information. But, if the database contains only one model from MLA (e.g. let say we have a model generated from two tasks MLA [[1000,1000],[500,500]), and if the user provides only one task information (e.g. [[1000,1000]]) when calling *LoadSurrogateModel*, we do not use the LCM model. This can also be relaxed with more efforts.
-
-- Our current next step is to provide a wrapper function for providing IS, PS, and OS (e.g. Listing 3) in the context of further TLA development and/or for other more flexible use cases (e.g. the user may want to run MLA which require space definition while re-using a model function). We can use a meta description file instead of writing it in the Python driver code.
--->

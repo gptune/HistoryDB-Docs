@@ -1,6 +1,6 @@
 # History DB Repository
 
-We offer two interfaces to access the repository (1) interactive web-dashboard or (2) an HTTPs RESTful API (called crowd-tune API).
+We offer two interfaces to access the repository (1) interactive web-dashboard or (2) a programmable HTTPs API based on a RESTful design.
 
 ## Interactive Dashboard
 
@@ -96,7 +96,7 @@ In case there are multiple records for the same machine (this is possible as the
 ## Programmable API
 
 The programmable API is an API to access the repository via HTTPs based on REpresentational State Transfer (REST) principles, which means that the database resources can be identified via a uniform resource identifier (URL) and accessed in various programming languages like C++/Python.
-This means that the user can query the best available tuning parameter to run a certain HPC code.
+Using this API, users can query the best available tuning parameter to run a certain HPC code.
 
 ### API Format
 
@@ -119,7 +119,7 @@ For the JSON format describing a function evaluation data, please refer to Secti
 
 Unlike the web-dashboard where the user can login from a web browser, all API requests need to contain an API key with a **x-api-key** header (e.g. { ''X-Api-Key'': ''your_API_key''}).
 Each user can generate one or more API keys at [https://gptune.lbl.gov/account/access-tokens](https://gptune.lbl.gov/account/access-tokens).
-When generating an API key, the user can select a display option whether the user agrees to display the user info or prefers to be anonymous.
+When generating an API key, the user can select an option whether the user agrees to disclose the user info or prefers to be anonymous.
 Note that, users have to manage their API keys securely, because API keys are used instead of passwords.
 Users have responsibility for any violations conducted using user API keys.
 
@@ -168,9 +168,13 @@ r = requests.post(url = "https://gptune.lbl.gov/direct-upload",
 
 ### Run GPTune with an API key
 
-Users can provide an API key to run GPTune autotuner with the HistoryDB repository.
-In other words, historical performance data can be downloaded automatically, and function evaluation results can also be submitted to the repository automatically.
-A more detailed example can be found [here](https://github.com/gptune/GPTune/blob/master/examples/PLASMA_TEST/dgels.py)
+Users can provide an API key to run GPTune autotuner using the HistoryDB repository.
+In other words, historical performance data can be downloaded automatically from the repository, and obtained function evaluation results can also be submitted to the repository automatically.
+The following is a snippet of code using this feature.
+Based on the history database interface explained in the [GPTune Local DB section](historydb_localdb.md), users can provide their API keys in the tuning metadata dictionary.
+Also, in this example, *"spack": ["plasma"]* means that the PLASMA software is installed by Spack.
+Therefore, our database can automatically parse the software dependency of the installed PLASMA software and query performance data based on the software information.
+A more detailed example can be found [here](https://github.com/gptune/GPTune/blob/master/examples/PLASMA/dgels.py)
 
 ```Python
 def objectives():
@@ -198,5 +202,4 @@ data = Data(problem)
 
 gt = GPTune(problem, computer=computer, data=data, options=options, historydb=historydb)
 gt.MLA(Input_task=[..], NS=NS, NI=NI)
-
 ```

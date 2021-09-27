@@ -34,6 +34,12 @@ Welcome to GPTune History Database's documentation!
 
 .. toctree::
    :maxdepth: 2
+   :caption: References:
+
+   src/references.md
+
+.. toctree::
+   :maxdepth: 2
    :caption: User Feedback:
 
    src/userfeedback.md
