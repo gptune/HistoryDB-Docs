@@ -29,7 +29,6 @@ In the shared repository, all submitted performance data is stored in a storage 
 The shared database requires login credentials for users to submit their performance data.
 Every submitted performance data can have multiple accessibility options: publicly available data, private data, or data that can be shared with specific users.
 In other words, the shared repository allows anyone to browse and download publicly available data.
-We offer two interfaces to access the repository (1) interactive web-dashboard or (2) a programmable API based on a RESTful design.
 More detailed user manuals of these interfaces are given at [History DB Repository](./historydb_repository.md) tab.
 
 In our recent paper "Enhancing Autotuning Capability with a History Database" [[7](references.md)] about the history database presents some more detailed information and benefits of using the history database.
